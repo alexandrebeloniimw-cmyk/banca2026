@@ -75,6 +75,7 @@ td.pe{color:var(--suave);font-size:12.5px;min-width:120px}
 td.nt{text-align:center;font-size:17px;font-weight:700;color:var(--azul);font-variant-numeric:tabular-nums;white-space:nowrap}
 td.nt.vz{color:#c3c8d2;font-weight:400}
 tbody tr td.tt{background:var(--ouro-cl)!important;font-size:19px;font-weight:900}
+.ata{margin-top:5px;font-size:11px;font-weight:700;color:var(--azul);letter-spacing:.02em}
 .dica{display:none;font-size:12px;color:var(--suave);margin:-6px 0 8px}
 @media (max-width:760px){.dica{display:block}}
 .vazio{text-align:center;color:var(--suave);padding:30px 0}
@@ -146,7 +147,7 @@ function render(){
       <td class="pe">${esc(a.ex2)}</td>
       <td class="nt ${n2?"":"vz"}">${n2 ?? "–"}</td>
       <td class="nt tt ${tt?"":"vz"}">${tt ?? "–"}</td>
-      <td class="c"><span class="pill ${classe(n.situacao)}">${esc(sit)}</span></td>
+      <td class="c"><span class="pill ${classe(n.situacao)}">${esc(sit)}</span>${n.ata ? '<div class="ata">✓ Ata emitida</div>' : ''}</td>
     </tr>`;
   }).join("") : `<tr><td colspan="10" class="vazio">Nenhum resultado para essa busca.</td></tr>`;
 
@@ -157,7 +158,8 @@ function render(){
     `<span class="chip"><b>${concl.length}</b>de ${ALUNOS.length} avaliados</span>` +
     `<span class="chip ok"><b>${cont("ok")}</b>aprovados</span>` +
     `<span class="chip aj"><b>${cont("aj")}</b>com ajustes</span>` +
-    `<span class="chip rp"><b>${cont("rp")}</b>reprovados</span>`;
+    `<span class="chip rp"><b>${cont("rp")}</b>reprovados</span>` +
+    `<span class="chip"><b>${vals.filter(v => v.ata).length}</b>atas emitidas</span>`;
 }
 
 function status(txt, tipo){
@@ -191,7 +193,8 @@ function lerCSV(txt){
     if (quadro) {
       const total = numero(l[6]);
       return { n: parseInt(l[0], 10), nota1: numero(l[3]), nota2: numero(l[5]), total,
-               situacao: total === null ? "" : ((l[8] || "").trim() || l[7] || "") };
+               situacao: total === null ? "" : ((l[8] || "").trim() || l[7] || ""),
+               ata: /pdf|ata/i.test(l[10] || "") };
     }
     const total = numero(l[6]);
     return { n: parseInt(l[0], 10), nota1: numero(l[4]), nota2: numero(l[5]), total,

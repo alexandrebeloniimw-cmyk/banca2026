@@ -12,7 +12,7 @@
    Cole entre as aspas o link da aba "Página" publicada na web em formato .csv
    (Arquivo > Compartilhar > Publicar na Web). Enquanto estiver como está, a página
    mostra os alunos com as notas "Aguardando". */
-const ENDERECO = "COLE_AQUI_O_LINK_CSV";
+const ENDERECO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV9dhtuItSrD4Y-oC32iB3gaoua5c59XxY8U5KWLeogmg0u-ZfF2DxguU5NmXefuApZlcx89LVc3if/pub?gid=548515795&single=true&output=csv";
 </script>
 <style>
 :root{
@@ -185,7 +185,14 @@ function lerCSV(txt){
   }
   if (campo !== "" || linha.length) { linha.push(campo); linhas.push(linha); }
   // colunas da aba Página: Nº, Seminarista, Título, Orientador, Nota 1, Nota 2, Nota final, Resultado
+  const cab = (linhas[0] || []).join("|");
+  const quadro = /Examinador/i.test(cab); // aba Quadro: Nº, Seminarista, Ex1, Nota 1, Ex2, Nota 2, Total, Resultado pela nota, Resultado da banca
   return linhas.slice(1).filter(l => parseInt(l[0], 10)).map(l => {
+    if (quadro) {
+      const total = numero(l[6]);
+      return { n: parseInt(l[0], 10), nota1: numero(l[3]), nota2: numero(l[5]), total,
+               situacao: total === null ? "" : ((l[8] || "").trim() || l[7] || "") };
+    }
     const total = numero(l[6]);
     return { n: parseInt(l[0], 10), nota1: numero(l[4]), nota2: numero(l[5]), total,
              situacao: total === null ? "" : (l[7] || "") };

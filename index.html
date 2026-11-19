@@ -129,6 +129,15 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 .ex li{padding:3px 0;border-top:1px dashed var(--linha);display:flex;gap:6px}
 .ex li em{font-style:normal;color:var(--ouro);font-weight:900;font-variant-numeric:tabular-nums}
 .ex .feito{font-size:12.5px;color:var(--ok);font-weight:700;margin-top:6px}
+.dg{margin-top:9px;padding-top:9px;border-top:1px solid var(--linha);font-size:12.5px}
+.dg .dm{display:flex;align-items:center;gap:10px}
+.dg .dm b{font-size:24px;font-weight:900;color:var(--azul);font-variant-numeric:tabular-nums}
+.dg .dm span{color:var(--suave);font-size:11.5px;line-height:1.25}
+.dg .df{color:var(--suave);margin:3px 0 6px;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+.tag.aci{background:#e3ecfb;color:#2c4f9e} .tag.aba{background:var(--aj-cl);color:var(--aj)} .tag.neu{background:#eef0f4;color:var(--suave)}
+.dg .dc{margin-top:5px;color:var(--texto)} .dg .dc span{color:var(--suave)}
+.vazio-dg{color:var(--suave);font-style:italic}
 .orient-t table{min-width:640px}
 .prazo{margin-top:4px;font-size:11px;font-weight:700;color:var(--aj)}
 .prazo.venc{color:var(--rp)}
@@ -175,7 +184,7 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 <main class="wrap">
   <div class="barra">
     <nav class="nav" aria-label="Seções">
-      <a href="#alunos">Alunos</a><a href="#pendencias">Pendências por examinador</a><a href="#orientadores">Por orientador</a>
+      <a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#orientadores">Por orientador</a>
     </nav>
     <button class="btn imp" id="imprimir" type="button">Imprimir ou salvar PDF</button>
   </div>
@@ -195,8 +204,8 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
   </table></div>
 
   <section class="secao" id="pendencias">
-    <h2>Pendências por examinador</h2>
-    <p>Avaliações já enviadas por cada professor(a). Quem tem pendência aparece primeiro.</p>
+    <h2>Examinadores: pendências e diagnóstico</h2>
+    <p>Avaliações enviadas, média das notas que cada professor(a) atribuiu e comparação com a banca e com o colega que avaliou os mesmos alunos. Quem tem pendência aparece primeiro.</p>
   </section>
   <div class="exs" id="exs"></div>
 
@@ -289,12 +298,37 @@ function painel(){
   const ex = {};
   ALUNOS.forEach(a => {
     const v = notas[a.n] || {};
-    [[a.ex1, v.nota1], [a.ex2, v.nota2]].forEach(([p, nt]) => {
-      (ex[p] = ex[p] || { feitas: 0, falta: [] });
-      if (temNota(nt)) ex[p].feitas++; else ex[p].falta.push(a);
+    [[a.ex1, v.nota1, v.nota2], [a.ex2, v.nota2, v.nota1]].forEach(([p, nt, outra]) => {
+      (ex[p] = ex[p] || { feitas: 0, falta: [], notas: [], difs: [] });
+      if (temNota(nt)) {
+        ex[p].feitas++; ex[p].notas.push(Number(nt));
+        if (temNota(outra)) ex[p].difs.push(Number(nt) - Number(outra));
+      } else ex[p].falta.push(a);
     });
   });
   const lim = p => p.replace(/^Prof(\.ª|\.)\s*/, "");
+  const todas = Object.values(ex).flatMap(o => o.notas);
+  const mediaBanca = todas.length ? todas.reduce((p, q) => p + q, 0) / todas.length : null;
+  const sinal = d => (d > 0 ? "+" : d < 0 ? "−" : "") + fmt(Math.abs(d));
+  const diag = o => {
+    if (!o.notas.length) return `<div class="dg vazio-dg">Diagnóstico aparece após a primeira avaliação enviada.</div>`;
+    const m = o.notas.reduce((p, q) => p + q, 0) / o.notas.length;
+    const mn = Math.min(...o.notas), mx = Math.max(...o.notas);
+    let comp = "";
+    if (mediaBanca !== null && todas.length > o.notas.length) {
+      const d = m - mediaBanca;
+      const cls = Math.abs(d) < 1 ? "neu" : d > 0 ? "aci" : "aba";
+      const txt = Math.abs(d) < 1 ? "na média da banca" : d > 0 ? "acima da média da banca" : "abaixo da média da banca";
+      comp += `<span class="tag ${cls}">${sinal(d)} · ${txt}</span>`;
+    }
+    if (o.difs.length) {
+      const dc = o.difs.reduce((p, q) => p + q, 0) / o.difs.length;
+      const t = Math.abs(dc) < 1 ? "notas próximas às do colega de banca" : dc > 0 ? `em média ${fmt(Math.abs(dc))} pts acima do colega de banca` : `em média ${fmt(Math.abs(dc))} pts abaixo do colega de banca`;
+      comp += `<div class="dc">${t} <span>(${o.difs.length} ${o.difs.length === 1 ? "defesa comparada" : "defesas comparadas"})</span></div>`;
+    }
+    return `<div class="dg"><div class="dm"><b>${fmt(m)}</b><span>média das notas dadas<br>(de 0 a 50)</span></div>
+      <div class="df">Menor ${fmt(mn)} · Maior ${fmt(mx)}</div>${comp}</div>`;
+  };
   const lista = Object.entries(ex).sort((p, q) => q[1].falta.length - p[1].falta.length || lim(p[0]).localeCompare(lim(q[0]), "pt-BR"));
   document.getElementById("exs").innerHTML = lista.map(([p, o]) => {
     const t = o.feitas + o.falta.length;
@@ -302,6 +336,7 @@ function painel(){
       <div class="nm">${esc(p)}</div>
       <div class="ct"><b>${o.feitas} de ${t}</b> avaliações enviadas</div>
       <div class="prog"><i style="width:${Math.round(o.feitas / t * 100)}%;background:${o.falta.length ? "var(--ouro)" : "var(--ok)"}"></i></div>
+      ${diag(o)}
       ${o.falta.length ? `<ul>${o.falta.map(a => `<li><em>${String(a.n).padStart(2, "0")}</em>${esc(a.aluno)}</li>`).join("")}</ul>` : `<div class="feito">✓ Todas enviadas</div>`}
     </div>`;
   }).join("");

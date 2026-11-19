@@ -138,6 +138,27 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 .tag.aci{background:#e3ecfb;color:#2c4f9e} .tag.aba{background:var(--aj-cl);color:var(--aj)} .tag.neu{background:#eef0f4;color:var(--suave)}
 .dg .dc{margin-top:5px;color:var(--texto)} .dg .dc span{color:var(--suave)}
 .vazio-dg{color:var(--suave);font-style:italic}
+.dest{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-bottom:12px}
+.dcol{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;min-width:0}
+.dcol.alta{border-top:4px solid var(--ok)} .dcol.baixa{border-top:4px solid var(--rp)}
+.dcol h3{margin:0 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--suave)}
+.di{display:flex;gap:12px;align-items:center;padding:7px 0;border-top:1px dashed var(--linha)}
+.di:first-of-type{border-top:none}
+.di b{font-size:22px;font-weight:900;color:var(--azul);min-width:54px;font-variant-numeric:tabular-nums}
+.dt{font-family:var(--f-tit);font-style:italic;font-size:13.5px;line-height:1.3}
+.da{font-size:11.5px;color:var(--suave);margin-top:2px}
+.vz-t{color:var(--suave);font-style:italic;font-size:13px;margin:4px 0}
+.eixos{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:10px}
+.eixo{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;min-width:0}
+.eh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.en{font-weight:700;color:var(--azul)} .ec{font-size:12px;color:var(--suave)}
+.em{font-size:26px;font-weight:900;color:var(--azul);font-variant-numeric:tabular-nums;line-height:1}
+.em.vz{color:#c3c8d2;font-weight:400}
+.eixo ul{list-style:none;margin:9px 0 0;padding:0}
+.eixo li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px dashed var(--linha);font-size:12.5px}
+.eixo li .et{font-family:var(--f-tit);font-style:italic;line-height:1.3;min-width:0}
+.eixo li b{font-variant-numeric:tabular-nums;color:var(--azul);white-space:nowrap}
+.eixo li b.vz{color:#c3c8d2;font-weight:400}
 .orient-t table{min-width:640px}
 .prazo{margin-top:4px;font-size:11px;font-weight:700;color:var(--aj)}
 .prazo.venc{color:var(--rp)}
@@ -152,9 +173,9 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
   .tabela{overflow:visible;border:none}
   table{min-width:0!important;font-size:10.5px}
   thead th{position:static}
-  tr,.ex,.kpi{break-inside:avoid}
+  tr,.ex,.kpi,.eixo,.dcol{break-inside:avoid}
   .secao{break-before:page;margin-top:0}
-  .kpi,.resbar,.ex,thead th,tbody td,.pill,.prog i,.faixa i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .kpi,.resbar,.ex,.eixo,.dcol,thead th,tbody td,.pill,.prog i,.faixa i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .exs{grid-template-columns:repeat(3,1fr)}
 }
 </style>
@@ -184,7 +205,7 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 <main class="wrap">
   <div class="barra">
     <nav class="nav" aria-label="Seções">
-      <a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#orientadores">Por orientador</a>
+      <a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#temas">Por tema</a><a href="#orientadores">Por orientador</a>
     </nav>
     <button class="btn imp" id="imprimir" type="button">Imprimir ou salvar PDF</button>
   </div>
@@ -208,6 +229,13 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
     <p>Avaliações enviadas, média das notas que cada professor(a) atribuiu e comparação com a banca e com o colega que avaliou os mesmos alunos. Quem tem pendência aparece primeiro.</p>
   </section>
   <div class="exs" id="exs"></div>
+
+  <section class="secao" id="temas">
+    <h2>Diagnóstico por tema</h2>
+    <p>Os artigos foram agrupados em eixos temáticos pelo título. A média considera só as defesas já concluídas (nota final de 0 a 100).</p>
+  </section>
+  <div class="dest" id="dest"></div>
+  <div class="eixos" id="eixos"></div>
 
   <section class="secao" id="orientadores">
     <h2>Desempenho por orientador</h2>
@@ -261,6 +289,15 @@ function render(){
   painel();
 }
 
+const EIXOS = [
+  { nome: "Cuidado pastoral, saúde e aconselhamento", alunos: [1, 5, 8, 20] },
+  { nome: "Família e ministério", alunos: [2, 6, 12] },
+  { nome: "Espiritualidade e teologia wesleyana", alunos: [7, 10, 11, 14, 19] },
+  { nome: "Discipulado, educação e formação", alunos: [16, 17, 24] },
+  { nome: "Missão, evangelização e igreja", alunos: [3, 4, 9, 15, 18, 23] },
+  { nome: "Liderança, oração e textos bíblicos", alunos: [13, 21, 22] }
+];
+const eixoDe = n => (EIXOS.find(e => e.alunos.includes(n)) || {}).nome || "";
 const PRAZO = new Date(2026, 10, 28); // defesa 21/11 + 7 dias
 function prazoHTML(){
   const hoje = new Date(); hoje.setHours(0,0,0,0);
@@ -338,6 +375,37 @@ function painel(){
       <div class="prog"><i style="width:${Math.round(o.feitas / t * 100)}%;background:${o.falta.length ? "var(--ouro)" : "var(--ok)"}"></i></div>
       ${diag(o)}
       ${o.falta.length ? `<ul>${o.falta.map(a => `<li><em>${String(a.n).padStart(2, "0")}</em>${esc(a.aluno)}</li>`).join("")}</ul>` : `<div class="feito">✓ Todas enviadas</div>`}
+    </div>`;
+  }).join("");
+
+  // Diagnóstico por tema
+  const porEixo = EIXOS.map(e => {
+    const itens = e.alunos.map(n => ({ a: ALUNOS.find(x => x.n === n), v: notas[n] || {} })).filter(x => x.a);
+    const c = itens.filter(x => temNota(x.v.total));
+    const m = c.length ? c.reduce((p, x) => p + Number(x.v.total), 0) / c.length : null;
+    return { ...e, itens, c, m };
+  }).sort((p, q) => (q.m ?? -1) - (p.m ?? -1));
+  const comMedia = porEixo.filter(e => e.m !== null);
+  const destaque = (titulo, cls, arr) => `<div class="dcol ${cls}"><h3>${titulo}</h3>${arr.length ? arr.map(x => `
+      <div class="di"><b>${fmt(x.v.total)}</b><div><div class="dt">${esc(x.a.titulo)}</div><div class="da">${esc(x.a.aluno)} · ${esc(eixoDe(x.a.n))}</div></div></div>`).join("") : `<p class="vz-t">Aparece quando houver defesas concluídas.</p>`}</div>`;
+  const ord = concl.slice().sort((p, q) => q.v.total - p.v.total);
+  const nAlto = Math.min(3, Math.ceil(ord.length / 2)), nBaixo = Math.min(3, Math.floor(ord.length / 2));
+  document.getElementById("dest").innerHTML =
+    destaque("Notas mais altas", "alta", ord.slice(0, nAlto)) +
+    destaque("Notas mais baixas", "baixa", nBaixo ? ord.slice(-nBaixo).reverse() : []);
+  document.getElementById("eixos").innerHTML = porEixo.map((e, i) => {
+    let tag = "";
+    if (comMedia.length >= 2 && e.m !== null) {
+      if (e === comMedia[0]) tag = `<span class="tag aci">Melhor desempenho</span>`;
+      else if (e === comMedia[comMedia.length - 1]) tag = `<span class="tag aba">Menor desempenho</span>`;
+    }
+    return `<div class="eixo">
+      <div class="eh"><div><div class="en">${esc(e.nome)}</div><div class="ec">${e.c.length} de ${e.itens.length} defesas concluídas</div></div>
+        <div class="em ${e.m === null ? "vz" : ""}">${e.m === null ? "–" : fmt(e.m)}</div></div>
+      <div class="prog"><i style="width:${e.m === null ? 0 : e.m}%;background:${e.m === null ? "#cfd4dd" : e.m >= 70 ? "var(--ok)" : e.m >= 50 ? "#d9a03f" : "var(--rp)"}"></i></div>
+      ${tag ? `<div style="margin-top:7px">${tag}</div>` : ""}
+      <ul>${e.itens.slice().sort((p, q) => (temNota(q.v.total) ? q.v.total : -1) - (temNota(p.v.total) ? p.v.total : -1)).map(x => `
+        <li><span class="et">${esc(x.a.titulo)}</span><b class="${temNota(x.v.total) ? "" : "vz"}">${temNota(x.v.total) ? fmt(x.v.total) : "–"}</b></li>`).join("")}</ul>
     </div>`;
   }).join("");
 

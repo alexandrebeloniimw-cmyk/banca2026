@@ -103,6 +103,55 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 .nav a:hover,.btn:hover{border-color:var(--ouro)}
 .btn.imp{background:var(--azul);color:#fff;border-color:var(--azul)}
 .btn:focus-visible{outline:2px solid var(--ouro);outline-offset:2px}
+.chamada{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:16px;margin-bottom:14px;scroll-margin-top:16px}
+.ch-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+.ch-top h2{font-family:var(--f-tit);font-weight:600;color:var(--azul);font-size:22px;margin:0}
+.ch-top p{margin:2px 0 0;color:var(--suave);font-size:13px}
+.ch-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+@media (max-width:860px){.ch-grid{grid-template-columns:1fr}}
+.agora{align-self:start;background:var(--azul);color:#fff;border-radius:10px;padding:18px 20px;border-left:6px solid var(--ouro);min-width:0}
+.agora small{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#d9c08a;font-weight:700}
+.ag-nome{font-size:clamp(22px,3.2vw,30px);font-weight:900;margin:6px 0 4px;line-height:1.15}
+.ag-tit{font-family:var(--f-tit);font-style:italic;font-size:16px;color:#dfe4ef;line-height:1.35}
+.ag-ex{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+.ag-ex span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#d9c08a;font-weight:700;margin-right:2px}
+.ag-ex b{background:rgba(255,255,255,.12);border:1px solid rgba(217,192,138,.5);border-radius:999px;padding:5px 12px;font-size:14px}
+.ag-st{margin-top:10px;font-size:12.5px;color:#f3d9a0}
+.ag-fim b{display:block;font-size:22px} .ag-fim span{color:#c9cfdd}
+.prox{min-width:0}
+.prox h3,.t-prox h3{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave)}
+.prox ol,.t-prox ol{list-style:none;margin:0;padding:0}
+.prox li,.t-prox li{display:flex;gap:10px;padding:7px 0;border-top:1px dashed var(--linha)}
+.prox li:first-child{border-top:none}
+.prox li em,.t-prox li em,.ordem-completa li em{font-style:normal;font-weight:900;color:var(--ouro);min-width:30px;font-variant-numeric:tabular-nums}
+.px-nome{font-weight:700;color:var(--azul);font-size:14px}
+.px-tit{font-family:var(--f-tit);font-style:italic;font-size:12.5px;line-height:1.3}
+.px-ex{font-size:12px;color:var(--suave);margin-top:1px}
+.ordem-completa{margin-top:12px;border-top:1px solid var(--linha);padding-top:10px}
+.ordem-completa summary{cursor:pointer;font-weight:700;color:var(--azul);font-size:13.5px}
+.ordem-completa ol{list-style:none;margin:8px 0 0;padding:0}
+.ordem-completa li{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-top:1px solid var(--linha);font-size:13px}
+.ordem-completa li div{flex:1;min-width:0} .ordem-completa li i{font-family:var(--f-tit)}
+.ordem-completa li div span{display:block;font-size:12px;color:var(--suave)}
+.ordem-completa li .st{font-size:11px;font-weight:700;white-space:nowrap;color:var(--esp)}
+.ordem-completa li.ok{opacity:.6} .ordem-completa li.ok .st{color:var(--ok)}
+.ordem-completa li.agora{background:var(--ouro-cl);border-radius:6px} .ordem-completa li.agora .st{color:var(--aj)}
+td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
+.tela{position:fixed;inset:0;background:var(--azul);color:#fff;z-index:50;overflow:auto;padding:max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) 24px max(24px,env(safe-area-inset-left))}
+.tela .fechar{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tela-in{max-width:1300px;margin:30px auto 0;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px}
+@media (max-width:860px){.tela-in{grid-template-columns:1fr}}
+.t-agora small{display:block;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:#d9c08a;font-weight:700}
+.t-agora .ag-nome{font-size:clamp(34px,5vw,64px)}
+.t-agora .ag-tit{font-size:clamp(18px,2vw,26px)}
+.t-agora .ag-ex b{font-size:clamp(16px,1.8vw,22px);padding:8px 16px}
+.t-agora .ag-ex span{font-size:15px}
+.t-agora .ag-st{font-size:17px}
+.t-prox h3{color:#d9c08a;font-size:15px}
+.t-prox li{border-top-color:rgba(255,255,255,.18)}
+.t-prox .px-nome{color:#fff;font-size:clamp(16px,1.6vw,21px)}
+.t-prox .px-tit{color:#c9cfdd;font-size:clamp(13px,1.2vw,16px)}
+.t-prox .px-ex{color:#e6d3a6;font-size:clamp(13px,1.2vw,16px)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
 .kpi{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;min-width:0}
 .kpi small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);font-weight:700}
@@ -165,7 +214,7 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 @media print{
   @page{size:A4 landscape;margin:12mm}
   body{background:#fff;font-size:11px}
-  .topo,.nav,.btn,#busca,.status,.dica,footer .np{display:none!important}
+  .topo,.nav,.btn,#busca,.status,.dica,footer .np,.chamada,.tela{display:none!important}
   header{padding:8px 0 10px;border-bottom-width:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   header img{width:70px}
   h1{font-size:20px}
@@ -211,11 +260,29 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 <main class="wrap">
   <div class="barra">
     <nav class="nav" aria-label="Seções">
-      <a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#temas">Por tema</a><a href="#orientadores">Por orientador</a>
+      <a href="#chamada">Chamada</a><a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#temas">Por tema</a><a href="#orientadores">Por orientador</a>
     </nav>
     <button class="btn imp" id="imprimir" type="button">Imprimir ou salvar PDF</button>
   </div>
   <div class="status" id="status"><span class="ponto"></span><span id="statusTxt">Carregando as notas…</span></div>
+  <section class="chamada" id="chamada" aria-live="polite">
+    <div class="ch-top">
+      <div><h2>Chamada das defesas</h2><p>Segue a ordem oficial do dia. Avança sozinha quando os dois examinadores enviam as notas.</p></div>
+      <button class="btn imp" id="telao" type="button">Modo chamada (telão)</button>
+    </div>
+    <div class="ch-grid">
+      <div class="agora" id="agora"></div>
+      <div class="prox"><h3>Próximos</h3><ol id="proximos"></ol></div>
+    </div>
+    <details class="ordem-completa">
+      <summary>Ver a ordem completa das 24 defesas</summary>
+      <ol id="ordemLista"></ol>
+    </details>
+  </section>
+  <div class="tela" id="tela" hidden>
+    <button class="fechar" id="fecharTela" type="button" aria-label="Fechar modo chamada">✕ Fechar</button>
+    <div class="tela-in" id="telaConteudo"></div>
+  </div>
   <div class="kpis" id="kpis"></div>
   <div class="resbar" id="resbar"></div>
   <div class="secao" id="alunos" style="margin-top:22px;break-before:auto">
@@ -226,7 +293,7 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
   </div>
   <p class="dica">Arraste a tabela para o lado para ver as notas.</p>
   <div class="tabela"><table>
-    <thead><tr><th class="c">Nº</th><th>Aluno(a)</th><th>Título do artigo</th><th>Orientador(a)</th><th>Examinador(a) 1</th><th class="c">Nota 1</th><th>Examinador(a) 2</th><th class="c">Nota 2</th><th class="c tot">Total de pontos</th><th class="c">Situação</th></tr></thead>
+    <thead><tr><th class="c">Nº</th><th class="c">Ordem</th><th>Aluno(a)</th><th>Título do artigo</th><th>Orientador(a)</th><th>Examinador(a) 1</th><th class="c">Nota 1</th><th>Examinador(a) 2</th><th class="c">Nota 2</th><th class="c tot">Total de pontos</th><th class="c">Situação</th></tr></thead>
     <tbody id="lista"></tbody>
   </table></div>
 
@@ -280,6 +347,7 @@ function render(){
     const sit = n.situacao || (n1 || n2 ? "Aguardando 2ª nota" : "Aguardando notas");
     return `<tr>
       <td class="n">${String(a.n).padStart(2,"0")}</td>
+      <td class="c od">${ordemDe(a.n)}º</td>
       <td class="al">${esc(a.aluno)}</td>
       <td class="ti">${esc(a.titulo)}</td>
       <td class="pe">${esc(a.orientador)}</td>
@@ -290,9 +358,10 @@ function render(){
       <td class="nt tt ${tt?"":"vz"}">${tt ?? "–"}</td>
       <td class="c"><span class="pill ${classe(n.situacao)}">${esc(sit)}</span>${classe(n.situacao) === "aj" ? prazoHTML() : ''}${n.ata ? '<div class="ata">✓ Ata emitida</div>' : ''}</td>
     </tr>`;
-  }).join("") : `<tr><td colspan="10" class="vazio">Nenhum resultado para essa busca.</td></tr>`;
+  }).join("") : `<tr><td colspan="11" class="vazio">Nenhum resultado para essa busca.</td></tr>`;
 
   painel();
+  chamada();
 }
 
 const EIXOS = [
@@ -312,6 +381,42 @@ function prazoHTML(){
   return `<div class="prazo ${d < 0 ? "venc" : ""}">Ajustes até 28/11 · ${txt}</div>`;
 }
 const temNota = v => v !== null && v !== undefined && v !== "";
+// Ordem oficial das defesas (nº do aluno na planilha, na sequência do dia)
+const ORDEM = [6, 12, 10, 8, 24, 7, 22, 18, 9, 4, 13, 11, 2, 5, 3, 1, 15, 23, 21, 14, 16, 17, 19, 20];
+const ordemDe = n => String(ORDEM.indexOf(n) + 1).padStart(2, "0");
+const aluno = n => ALUNOS.find(a => a.n === n);
+const concluida = n => temNota((notas[n] || {}).total);
+function cartaoAgora(a, grande){
+  if (!a) return `<div class="ag-fim"><b>Todas as defesas foram concluídas.</b><span>Obrigado, banca examinadora!</span></div>`;
+  const v = notas[a.n] || {};
+  const parcial = temNota(v.nota1) || temNota(v.nota2);
+  return `<small>Em defesa agora · ${ordemDe(a.n)}º de ${ORDEM.length}</small>
+    <div class="ag-nome">${esc(a.aluno)}</div>
+    <div class="ag-tit">${esc(a.titulo)}</div>
+    <div class="ag-ex"><span>Banca</span><b>${esc(a.ex1)}</b><b>${esc(a.ex2)}</b></div>
+    ${parcial ? `<div class="ag-st">1 de 2 avaliações recebidas</div>` : ""}`;
+}
+function itemProx(a, i){
+  return `<li><em>${ordemDe(a.n)}º</em><div><div class="px-nome">${esc(a.aluno)}${i === 0 ? ' <span class="tag aci">a seguir</span>' : ""}</div>
+    <div class="px-tit">${esc(a.titulo)}</div>
+    <div class="px-ex">${esc(a.ex1)} · ${esc(a.ex2)}</div></div></li>`;
+}
+function chamada(){
+  const pend = ORDEM.filter(n => !concluida(n));
+  const atual = pend.length ? aluno(pend[0]) : null;
+  const prox = pend.slice(1, 7).map(aluno);
+  document.getElementById("agora").innerHTML = cartaoAgora(atual);
+  document.getElementById("proximos").innerHTML = prox.length ? prox.map(itemProx).join("") : `<li class="vz-t">Não há mais alunos na fila.</li>`;
+  document.getElementById("ordemLista").innerHTML = ORDEM.map(n => {
+    const a = aluno(n), st = concluida(n) ? "ok" : (atual && n === atual.n ? "agora" : "esp");
+    const rot = st === "ok" ? "✓ Concluída" : st === "agora" ? "Em defesa agora" : "Aguardando";
+    return `<li class="${st}"><em>${ordemDe(n)}º</em><div><b>${esc(a.aluno)}</b> — <i>${esc(a.titulo)}</i><span>${esc(a.ex1)} · ${esc(a.ex2)}</span></div><span class="st">${rot}</span></li>`;
+  }).join("");
+  const tela = document.getElementById("telaConteudo");
+  if (tela) tela.innerHTML = `<div class="t-agora">${cartaoAgora(atual)}</div>
+    <div class="t-prox"><h3>Próximos</h3><ol>${prox.length ? prox.map(itemProx).join("") : "<li>—</li>"}</ol></div>`;
+}
+
 
 function painel(){
   const vals = ALUNOS.map(a => ({ a, v: notas[a.n] || {} }));
@@ -491,6 +596,15 @@ async function carregar(){
 }
 
 document.getElementById("imprimir").addEventListener("click", () => window.print());
+const telaEl = document.getElementById("tela");
+document.getElementById("telao").addEventListener("click", () => {
+  telaEl.hidden = false; chamada();
+  if (telaEl.requestFullscreen) telaEl.requestFullscreen().catch(() => {});
+});
+function fecharTela(){ telaEl.hidden = true; if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); }
+document.getElementById("fecharTela").addEventListener("click", fecharTela);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !telaEl.hidden) fecharTela(); });
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && !telaEl.hidden) telaEl.hidden = true; });
 document.getElementById("busca").addEventListener("input", e => { filtro = sem(e.target.value.trim()); render(); });
 render();
 carregar();

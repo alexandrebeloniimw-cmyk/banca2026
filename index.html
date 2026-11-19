@@ -460,7 +460,7 @@ function lerCSV(txt){
       const total = numero(l[6]);
       return { n: parseInt(l[0], 10), nota1: numero(l[3]), nota2: numero(l[5]), total,
                situacao: total === null ? "" : ((l[8] || "").trim() || l[7] || ""),
-               ata: /pdf|ata/i.test(l[10] || "") };
+               ata: total !== null && /pdf|ata/i.test(l[10] || "") };
     }
     const total = numero(l[6]);
     return { n: parseInt(l[0], 10), nota1: numero(l[4]), nota2: numero(l[5]), total,

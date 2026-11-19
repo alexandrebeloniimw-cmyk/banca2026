@@ -96,6 +96,58 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
   .pill{white-space:normal;font-size:10px;line-height:1.2}
   .nota .nm{max-width:100%}
 }
+
+/* ---- painel ---- */
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav a,.btn{font:inherit;font-size:13px;font-weight:700;color:var(--azul);background:#fff;border:1px solid var(--linha);border-radius:999px;padding:7px 13px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.nav a:hover,.btn:hover{border-color:var(--ouro)}
+.btn.imp{background:var(--azul);color:#fff;border-color:var(--azul)}
+.btn:focus-visible{outline:2px solid var(--ouro);outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;min-width:0}
+.kpi small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);font-weight:700}
+.kpi b{display:block;font-size:26px;font-weight:900;color:var(--azul);font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.kpi span{font-size:12px;color:var(--suave);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{height:7px;background:#eceef3;border-radius:4px;overflow:hidden;margin-top:7px}
+.prog i{display:block;height:100%;background:var(--ouro);border-radius:4px}
+.resbar{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.resbar .faixa{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#eceef3;margin:8px 0}
+.resbar .faixa i{display:block;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--suave)}
+.leg b{color:var(--texto);font-variant-numeric:tabular-nums}
+.leg .q{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.secao{margin:34px 0 14px;scroll-margin-top:16px}
+.secao h2{font-family:var(--f-tit);font-weight:600;color:var(--azul);font-size:22px;margin:0 0 2px}
+.secao p{margin:0;color:var(--suave);font-size:13.5px}
+.exs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:10px}
+.ex{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;min-width:0}
+.ex.ok{border-left:4px solid var(--ok)} .ex.pend{border-left:4px solid var(--aj)}
+.ex .nm{font-weight:700;color:var(--azul)}
+.ex .ct{font-size:13px;color:var(--suave);margin:2px 0 0}
+.ex .ct b{color:var(--texto)}
+.ex ul{margin:8px 0 0;padding:0;list-style:none;font-size:12.5px}
+.ex li{padding:3px 0;border-top:1px dashed var(--linha);display:flex;gap:6px}
+.ex li em{font-style:normal;color:var(--ouro);font-weight:900;font-variant-numeric:tabular-nums}
+.ex .feito{font-size:12.5px;color:var(--ok);font-weight:700;margin-top:6px}
+.orient-t table{min-width:640px}
+.prazo{margin-top:4px;font-size:11px;font-weight:700;color:var(--aj)}
+.prazo.venc{color:var(--rp)}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{background:#fff;font-size:11px}
+  .topo,.nav,.btn,#busca,.status,.dica,footer .np{display:none!important}
+  header{padding:8px 0 10px;border-bottom-width:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header img{width:70px}
+  h1{font-size:20px}
+  .wrap{max-width:none;padding:0}
+  .tabela{overflow:visible;border:none}
+  table{min-width:0!important;font-size:10.5px}
+  thead th{position:static}
+  tr,.ex,.kpi{break-inside:avoid}
+  .secao{break-before:page;margin-top:0}
+  .kpi,.resbar,.ex,thead th,tbody td,.pill,.prog i,.faixa i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .exs{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 </head>
 <body>
@@ -122,14 +174,39 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 
 <main class="wrap">
   <div class="barra">
-    <div class="resumo" id="resumo"></div>
-    <input type="search" id="busca" placeholder="Buscar aluno, título ou professor" aria-label="Buscar">
+    <nav class="nav" aria-label="Seções">
+      <a href="#alunos">Alunos</a><a href="#pendencias">Pendências por examinador</a><a href="#orientadores">Por orientador</a>
+    </nav>
+    <button class="btn imp" id="imprimir" type="button">Imprimir ou salvar PDF</button>
   </div>
   <div class="status" id="status"><span class="ponto"></span><span id="statusTxt">Carregando as notas…</span></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="resbar" id="resbar"></div>
+  <div class="secao" id="alunos" style="margin-top:22px;break-before:auto">
+    <div class="barra" style="margin:0">
+      <div><h2>Alunos</h2><p>Notas de cada examinador e resultado final.</p></div>
+      <input type="search" id="busca" placeholder="Buscar aluno, título ou professor" aria-label="Buscar">
+    </div>
+  </div>
   <p class="dica">Arraste a tabela para o lado para ver as notas.</p>
   <div class="tabela"><table>
     <thead><tr><th class="c">Nº</th><th>Aluno(a)</th><th>Título do artigo</th><th>Orientador(a)</th><th>Examinador(a) 1</th><th class="c">Nota 1</th><th>Examinador(a) 2</th><th class="c">Nota 2</th><th class="c tot">Total de pontos</th><th class="c">Situação</th></tr></thead>
     <tbody id="lista"></tbody>
+  </table></div>
+
+  <section class="secao" id="pendencias">
+    <h2>Pendências por examinador</h2>
+    <p>Avaliações já enviadas por cada professor(a). Quem tem pendência aparece primeiro.</p>
+  </section>
+  <div class="exs" id="exs"></div>
+
+  <section class="secao" id="orientadores">
+    <h2>Desempenho por orientador</h2>
+    <p>Resultado dos orientandos de cada professor(a), considerando só as defesas já concluídas.</p>
+  </section>
+  <div class="tabela orient-t"><table>
+    <thead><tr><th>Orientador(a)</th><th class="c">Orientandos</th><th class="c">Concluídas</th><th class="c tot">Média</th><th class="c">Aprovados</th><th class="c">Com ajustes</th><th class="c">Reprovados</th></tr></thead>
+    <tbody id="orient"></tbody>
   </table></div>
 </main>
 <footer>Notas atualizadas automaticamente a partir das avaliações da banca · nota final de 0 a 100 (soma dos dois examinadores)</footer>
@@ -168,19 +245,81 @@ function render(){
       <td class="pe">${esc(a.ex2)}</td>
       <td class="nt ${n2?"":"vz"}">${n2 ?? "–"}</td>
       <td class="nt tt ${tt?"":"vz"}">${tt ?? "–"}</td>
-      <td class="c"><span class="pill ${classe(n.situacao)}">${esc(sit)}</span>${n.ata ? '<div class="ata">✓ Ata emitida</div>' : ''}</td>
+      <td class="c"><span class="pill ${classe(n.situacao)}">${esc(sit)}</span>${classe(n.situacao) === "aj" ? prazoHTML() : ''}${n.ata ? '<div class="ata">✓ Ata emitida</div>' : ''}</td>
     </tr>`;
   }).join("") : `<tr><td colspan="10" class="vazio">Nenhum resultado para essa busca.</td></tr>`;
 
-  const vals = ALUNOS.map(a => notas[a.n] || {});
-  const concl = vals.filter(v => v.total !== null && v.total !== undefined && v.total !== "");
-  const cont = k => concl.filter(v => classe(v.situacao) === k).length;
-  document.getElementById("resumo").innerHTML =
-    `<span class="chip"><b>${concl.length}</b>de ${ALUNOS.length} avaliados</span>` +
-    `<span class="chip ok"><b>${cont("ok")}</b>aprovados</span>` +
-    `<span class="chip aj"><b>${cont("aj")}</b>com ajustes</span>` +
-    `<span class="chip rp"><b>${cont("rp")}</b>reprovados</span>` +
-    `<span class="chip"><b>${vals.filter(v => v.ata).length}</b>atas emitidas</span>`;
+  painel();
+}
+
+const PRAZO = new Date(2026, 10, 28); // defesa 21/11 + 7 dias
+function prazoHTML(){
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const d = Math.round((PRAZO - hoje) / 86400000);
+  const txt = d > 1 ? `faltam ${d} dias` : d === 1 ? "falta 1 dia" : d === 0 ? "vence hoje" : "prazo encerrado";
+  return `<div class="prazo ${d < 0 ? "venc" : ""}">Ajustes até 28/11 · ${txt}</div>`;
+}
+const temNota = v => v !== null && v !== undefined && v !== "";
+
+function painel(){
+  const vals = ALUNOS.map(a => ({ a, v: notas[a.n] || {} }));
+  const concl = vals.filter(x => temNota(x.v.total));
+  const cont = k => concl.filter(x => classe(x.v.situacao) === k).length;
+  const enviadas = vals.reduce((t, x) => t + (temNota(x.v.nota1) ? 1 : 0) + (temNota(x.v.nota2) ? 1 : 0), 0);
+  const tot = concl.map(x => Number(x.v.total));
+  const media = tot.length ? tot.reduce((p, q) => p + q, 0) / tot.length : null;
+  const maior = concl.slice().sort((p, q) => q.v.total - p.v.total)[0];
+  const menor = concl.slice().sort((p, q) => p.v.total - q.v.total)[0];
+  const atas = vals.filter(x => x.v.ata).length;
+  const N = ALUNOS.length, pct = Math.round(concl.length / N * 100);
+  const nome = x => x ? esc(x.a.aluno.split(" ").slice(0, 2).join(" ")) : "—";
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi"><small>Defesas concluídas</small><b>${concl.length} <span style="display:inline;font-size:14px">de ${N}</span></b><div class="prog"><i style="width:${pct}%"></i></div></div>
+    <div class="kpi"><small>Avaliações enviadas</small><b>${enviadas} <span style="display:inline;font-size:14px">de ${N * 2}</span></b><div class="prog"><i style="width:${Math.round(enviadas / (N * 2) * 100)}%"></i></div></div>
+    <div class="kpi"><small>Média geral</small><b>${media === null ? "–" : fmt(media)}</b><span>nota final de 0 a 100</span></div>
+    <div class="kpi"><small>Maior nota</small><b>${maior ? fmt(maior.v.total) : "–"}</b><span>${nome(maior)}</span></div>
+    <div class="kpi"><small>Menor nota</small><b>${menor ? fmt(menor.v.total) : "–"}</b><span>${nome(menor)}</span></div>
+    <div class="kpi"><small>Atas emitidas</small><b>${atas} <span style="display:inline;font-size:14px">de ${N}</span></b><div class="prog"><i style="width:${Math.round(atas / N * 100)}%"></i></div></div>`;
+  const seg = [["ok", cont("ok"), "var(--ok)", "Aprovados"], ["aj", cont("aj"), "#d9a03f", "Com ajustes"], ["rp", cont("rp"), "var(--rp)", "Reprovados"], ["esp", N - concl.length, "#cfd4dd", "Aguardando"]];
+  document.getElementById("resbar").innerHTML = `<small style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);font-weight:700">Resultados</small>
+    <div class="faixa">${seg.map(x => x[1] ? `<i style="width:${x[1] / N * 100}%;background:${x[2]}" title="${x[3]}: ${x[1]}"></i>` : "").join("")}</div>
+    <div class="leg">${seg.map(x => `<span><span class="q" style="background:${x[2]}"></span>${x[3]}: <b>${x[1]}</b></span>`).join("")}</div>`;
+
+  // Pendências por examinador
+  const ex = {};
+  ALUNOS.forEach(a => {
+    const v = notas[a.n] || {};
+    [[a.ex1, v.nota1], [a.ex2, v.nota2]].forEach(([p, nt]) => {
+      (ex[p] = ex[p] || { feitas: 0, falta: [] });
+      if (temNota(nt)) ex[p].feitas++; else ex[p].falta.push(a);
+    });
+  });
+  const lim = p => p.replace(/^Prof(\.ª|\.)\s*/, "");
+  const lista = Object.entries(ex).sort((p, q) => q[1].falta.length - p[1].falta.length || lim(p[0]).localeCompare(lim(q[0]), "pt-BR"));
+  document.getElementById("exs").innerHTML = lista.map(([p, o]) => {
+    const t = o.feitas + o.falta.length;
+    return `<div class="ex ${o.falta.length ? "pend" : "ok"}">
+      <div class="nm">${esc(p)}</div>
+      <div class="ct"><b>${o.feitas} de ${t}</b> avaliações enviadas</div>
+      <div class="prog"><i style="width:${Math.round(o.feitas / t * 100)}%;background:${o.falta.length ? "var(--ouro)" : "var(--ok)"}"></i></div>
+      ${o.falta.length ? `<ul>${o.falta.map(a => `<li><em>${String(a.n).padStart(2, "0")}</em>${esc(a.aluno)}</li>`).join("")}</ul>` : `<div class="feito">✓ Todas enviadas</div>`}
+    </div>`;
+  }).join("");
+
+  // Desempenho por orientador
+  const or = {};
+  ALUNOS.forEach(a => { (or[a.orientador] = or[a.orientador] || []).push(notas[a.n] || {}); });
+  const linhas = Object.entries(or).map(([p, vs]) => {
+    const c = vs.filter(v => temNota(v.total));
+    const m = c.length ? c.reduce((s2, v) => s2 + Number(v.total), 0) / c.length : null;
+    const k = x => c.filter(v => classe(v.situacao) === x).length;
+    return { p, n: vs.length, c: c.length, m, ok: k("ok"), aj: k("aj"), rp: k("rp") };
+  }).sort((p, q) => (q.m ?? -1) - (p.m ?? -1) || lim(p.p).localeCompare(lim(q.p), "pt-BR"));
+  document.getElementById("orient").innerHTML = linhas.map(l => `<tr>
+    <td class="al">${esc(l.p)}</td><td class="c">${l.n}</td><td class="c">${l.c}</td>
+    <td class="nt tt ${l.m === null ? "vz" : ""}">${l.m === null ? "–" : fmt(l.m)}</td>
+    <td class="c" style="color:var(--ok);font-weight:700">${l.ok || "–"}</td><td class="c" style="color:var(--aj);font-weight:700">${l.aj || "–"}</td><td class="c" style="color:var(--rp);font-weight:700">${l.rp || "–"}</td>
+  </tr>`).join("");
 }
 
 function status(txt, tipo){
@@ -242,6 +381,7 @@ async function carregar(){
   }
 }
 
+document.getElementById("imprimir").addEventListener("click", () => window.print());
 document.getElementById("busca").addEventListener("input", e => { filtro = sem(e.target.value.trim()); render(); });
 render();
 carregar();

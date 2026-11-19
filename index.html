@@ -23,6 +23,7 @@ const ENDERECO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSV9dhtuItSrD4
   --f-tit:"Spectral",Georgia,"Times New Roman",serif;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--fundo);color:var(--texto);font-family:var(--f-ui);font-size:15px;line-height:1.45}
 .topo{background:#161e37;font-size:13px}
 .topo .wrap{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding-block:8px}
@@ -152,6 +153,22 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 .t-prox .px-nome{color:#fff;font-size:clamp(16px,1.6vw,21px)}
 .t-prox .px-tit{color:#c9cfdd;font-size:clamp(13px,1.2vw,16px)}
 .t-prox .px-ex{color:#e6d3a6;font-size:clamp(13px,1.2vw,16px)}
+.po-fundo{position:fixed;inset:0;background:rgba(15,20,38,.55);z-index:60;display:flex;justify-content:center;align-items:flex-start;padding:max(20px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 20px max(12px,env(safe-area-inset-left));overflow:auto}
+.po{background:#fff;border-radius:12px;width:100%;max-width:620px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.po-cab{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}
+.po-cab h2{font-family:var(--f-tit);font-weight:600;color:var(--azul);font-size:22px;margin:0}
+.po-cab p{margin:2px 0 0;color:var(--suave);font-size:13px}
+.po-x{background:#eef0f4;border:none;border-radius:999px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--azul);flex:none}
+.po input{width:100%;margin-bottom:8px}
+.po-lista{list-style:none;margin:0;padding:0}
+.po-lista li{display:flex;gap:10px;align-items:center;padding:8px 6px;border-top:1px solid var(--linha)}
+.po-lista li em{font-style:normal;font-weight:900;color:var(--ouro);min-width:32px;font-variant-numeric:tabular-nums}
+.po-lista li div{flex:1;min-width:0}
+.po-lista li b{display:block;color:var(--azul);font-size:14px}
+.po-lista li span{display:block;font-size:12.5px;color:var(--suave)}
+.po-lista li i{font-style:normal;font-size:11px;font-weight:700;white-space:nowrap;color:var(--suave);text-align:right}
+.po-lista li.ok{opacity:.55} .po-lista li.ok i{color:var(--ok)}
+.po-lista li.agora{background:var(--ouro-cl);border-radius:6px} .po-lista li.agora i{color:var(--aj)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
 .kpi{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:12px 14px;min-width:0}
 .kpi small{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);font-weight:700}
@@ -214,7 +231,7 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 @media print{
   @page{size:A4 landscape;margin:12mm}
   body{background:#fff;font-size:11px}
-  .topo,.nav,.btn,#busca,.status,.dica,footer .np,.chamada,.tela{display:none!important}
+  .topo,.nav,.btn,#busca,.status,.dica,footer .np,.chamada,.tela,.po-fundo{display:none!important}
   header{padding:8px 0 10px;border-bottom-width:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   header img{width:70px}
   h1{font-size:20px}
@@ -231,7 +248,10 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 </head>
 <body>
 <div class="topo"><div class="wrap">
-  <span class="links"><a href="https://alexandrebeloniimw-cmyk.github.io/revistateologicoministerialiwecascadura2026/#inicio" target="_blank" rel="noopener">
+  <span class="links"><a href="#ordem" id="abrirOrdem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>
+    Ordem das defesas</a>
+  <a href="https://alexandrebeloniimw-cmyk.github.io/revistateologicoministerialiwecascadura2026/#inicio" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
     IWE Cascadura</a>
   <a href="https://drive.google.com/drive/folders/1a3UVb3mDUBMDUFIvVeidx7T2DmG67VgL?usp=drive_link" target="_blank" rel="noopener">
@@ -279,6 +299,16 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
       <ol id="ordemLista"></ol>
     </details>
   </section>
+  <div class="po-fundo" id="painelOrdem" hidden>
+    <div class="po" role="dialog" aria-modal="true" aria-labelledby="poTitulo">
+      <div class="po-cab">
+        <div><h2 id="poTitulo">Ordem das defesas</h2><p>21 de novembro de 2026 · a partir das 8h</p></div>
+        <button class="po-x" id="fecharOrdem" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <input type="search" id="buscaOrdem" placeholder="Digite o nome do aluno ou do professor" aria-label="Buscar na ordem">
+      <ol class="po-lista" id="poLista"></ol>
+    </div>
+  </div>
   <div class="tela" id="tela" hidden>
     <button class="fechar" id="fecharTela" type="button" aria-label="Fechar modo chamada">✕ Fechar</button>
     <div class="tela-in" id="telaConteudo"></div>
@@ -362,6 +392,7 @@ function render(){
 
   painel();
   chamada();
+  if (typeof poEl !== "undefined" && !poEl.hidden) painelOrdem();
 }
 
 const EIXOS = [
@@ -596,6 +627,28 @@ async function carregar(){
 }
 
 document.getElementById("imprimir").addEventListener("click", () => window.print());
+let filtroOrdem = "";
+function painelOrdem(){
+  const pend = ORDEM.filter(n => !concluida(n));
+  const atual = pend[0];
+  document.getElementById("poLista").innerHTML = ORDEM.map(n => {
+    const a = aluno(n);
+    if (filtroOrdem && !sem([a.aluno, a.ex1, a.ex2].join(" ")).includes(filtroOrdem)) return "";
+    let st, cls;
+    if (concluida(n)) { st = "✓ Concluída"; cls = "ok"; }
+    else if (n === atual) { st = "Em defesa agora"; cls = "agora"; }
+    else { const k = pend.indexOf(n); st = k === 1 ? "É o próximo" : `Faltam ${k} defesas antes`; cls = "esp"; }
+    return `<li class="${cls}"><em>${ordemDe(n)}º</em><div><b>${esc(a.aluno)}</b><span>${esc(a.ex1)} · ${esc(a.ex2)}</span></div><i>${st}</i></li>`;
+  }).join("") || `<li class="vz-t">Nenhum nome encontrado.</li>`;
+}
+const poEl = document.getElementById("painelOrdem");
+function abrirOrdem(e){ if (e) e.preventDefault(); poEl.hidden = false; painelOrdem(); document.getElementById("buscaOrdem").focus(); }
+function fecharOrdem(){ poEl.hidden = true; }
+document.getElementById("abrirOrdem").addEventListener("click", abrirOrdem);
+document.getElementById("fecharOrdem").addEventListener("click", fecharOrdem);
+poEl.addEventListener("click", e => { if (e.target === poEl) fecharOrdem(); });
+document.getElementById("buscaOrdem").addEventListener("input", e => { filtroOrdem = sem(e.target.value.trim()); painelOrdem(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !poEl.hidden) fecharOrdem(); });
 const telaEl = document.getElementById("tela");
 document.getElementById("telao").addEventListener("click", () => {
   telaEl.hidden = false; chamada();

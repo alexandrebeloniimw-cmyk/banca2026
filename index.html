@@ -192,6 +192,15 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 .leg{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--suave)}
 .leg b{color:var(--texto);font-variant-numeric:tabular-nums}
 .leg .q{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tn-ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.tn-ctl label{font-size:13.5px;color:var(--texto)} .tn-ctl input{width:64px;font:inherit;padding:6px 8px;border:1px solid var(--linha);border-radius:8px}
+.tn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.tn-c{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:14px 16px;border-top:5px solid var(--ouro)}
+.tn-c.t2{border-top-color:#2c6fbb} .tn-c h3{margin:0 0 8px;font-family:var(--f-tit);color:var(--azul);font-size:18px}
+.tn-c dl{display:grid;grid-template-columns:1fr auto;gap:5px 12px;margin:0;font-size:13.5px} .tn-c dt{color:var(--suave)} .tn-c dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.tn-graf{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:10px;margin-top:12px;overflow-x:auto}
+.tn-graf svg{display:block;width:100%;min-width:640px;height:auto}
+.tn-obs{font-size:12.5px;color:var(--suave);margin:8px 0 0}
 .secao{margin:34px 0 14px;scroll-margin-top:16px}
 .secao h2{font-family:var(--f-tit);font-weight:600;color:var(--azul);font-size:22px;margin:0 0 2px}
 .secao p{margin:0;color:var(--suave);font-size:13.5px}
@@ -290,7 +299,7 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 <main class="wrap">
   <div class="barra">
     <nav class="nav" aria-label="Seções">
-      <a href="#chamada">Chamada</a><a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#temas">Por tema</a><a href="#orientadores">Por orientador</a>
+      <a href="#chamada">Chamada</a><a href="#alunos">Alunos</a><a href="#pendencias">Examinadores</a><a href="#temas">Por tema</a><a href="#orientadores">Por orientador</a><a href="#turnos">Manhã × tarde</a>
     </nav>
     <button class="btn imp" id="imprimir" type="button">Imprimir ou salvar PDF</button>
   </div>
@@ -361,6 +370,19 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
     <thead><tr><th>Orientador(a)</th><th class="c">Orientandos</th><th class="c">Concluídas</th><th class="c tot">Média</th><th class="c">Aprovados</th><th class="c">Com ajustes</th><th class="c">Reprovados</th></tr></thead>
     <tbody id="orient"></tbody>
   </table></div>
+
+  <section class="secao" id="turnos">
+    <h2>Manhã × tarde: estudo por turno</h2>
+    <p>Compara as defesas da manhã (8h às 12h) com as da tarde (12h às 17h) pela ordem oficial. Considera só as defesas concluídas. “Nota quebrada” é a nota de um examinador que não é múltiplo de 5.</p>
+  </section>
+  <div class="tn-ctl">
+    <label>Defesas na manhã: <input type="number" id="tnManha" min="1" max="23" value="11"></label>
+    <button class="btn" id="tnPng" type="button">Baixar gráfico (PNG)</button>
+    <button class="btn" id="tnCsv" type="button">Baixar dados (CSV)</button>
+  </div>
+  <div class="tn-cards" id="tnCards"></div>
+  <div class="tn-graf" id="tnGraf"></div>
+  <p class="tn-obs" id="tnObs"></p>
 </main>
 <footer>Notas atualizadas automaticamente a partir das avaliações da banca · nota final de 0 a 100 (soma dos dois examinadores)</footer>
 
@@ -381,6 +403,77 @@ function classe(sit){
   return "esp";
 }
 
+
+// ---------- Estudo por turno (manhã × tarde) ----------
+let tnManha = 11;
+try { const v = parseInt(localStorage.getItem("tnManha"), 10); if (v >= 1 && v <= 23) tnManha = v; } catch (e) {}
+const tnTurno = n => ORDEM.indexOf(n) < tnManha ? 0 : 1;
+function tnDados(){
+  return ORDEM.map((n, i) => { const a = aluno(n), v = notas[n] || {}; const ok = concluida(n);
+    return {pos: i + 1, n, aluno: a.aluno, turno: tnTurno(n), ok, n1: ok && temNota(v.nota1) ? Number(v.nota1) : null, n2: ok && temNota(v.nota2) ? Number(v.nota2) : null, total: ok ? Number(v.total) : null, sit: v.situacao || ""}; });
+}
+const tnMedia = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+const tnDp = a => { if (a.length < 2) return null; const m = tnMedia(a); return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length); };
+const f1 = v => v === null ? "–" : (Math.round(v * 10) / 10).toString().replace(".", ",");
+function tnResumo(ds){
+  const c = ds.filter(d => d.ok), tot = c.map(d => d.total), ns = c.flatMap(d => [d.n1, d.n2].filter(x => x !== null));
+  const div = c.filter(d => d.n1 !== null && d.n2 !== null).map(d => Math.abs(d.n1 - d.n2));
+  const q = ns.filter(x => Math.abs(x / 5 - Math.round(x / 5)) > 1e-9).length;
+  return {prev: ds.length, conc: c.length, media: tnMedia(tot), dp: tnDp(tot), min: tot.length ? Math.min(...tot) : null, max: tot.length ? Math.max(...tot) : null,
+    mediaEx: tnMedia(ns), quebr: ns.length ? Math.round(100 * q / ns.length) : null, div: tnMedia(div),
+    ap: c.filter(d => classe(d.sit) === "ok").length, aj: c.filter(d => classe(d.sit) === "aj").length, rp: c.filter(d => classe(d.sit) === "rp").length};
+}
+function tnSvg(ds){
+  const W = 960, H = 380, L = 54, R = 20, T = 56, B = 62, pw = W - L - R, ph = H - T - B, bw = pw / ds.length;
+  const y = v => T + ph - v / 100 * ph, F = 'font-family="Lato,Arial,sans-serif"';
+  const cor = t => t === 0 ? "#b8892a" : "#2c6fbb";
+  let o = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" ${F}><rect width="${W}" height="${H}" fill="#fff"/>`;
+  o += `<text x="${L}" y="24" font-size="17" font-weight="700" fill="#1f2a4a">Nota final por ordem de defesa · manhã × tarde</text>`;
+  o += `<text x="${L}" y="42" font-size="12" fill="#6b7280">Artigos 2026 · IWE Polo Cascadura · 21/11/2026 · barras vazias = defesa ainda não concluída</text>`;
+  [0, 25, 50, 70, 100].forEach(g => { o += `<line x1="${L}" x2="${W - R}" y1="${y(g)}" y2="${y(g)}" stroke="${g === 70 ? "#1d7349" : "#e3e6ec"}" stroke-dasharray="${g === 70 ? "5 4" : "0"}"/><text x="${L - 8}" y="${y(g) + 4}" font-size="11" text-anchor="end" fill="#6b7280">${g}</text>`; });
+  ds.forEach((d, i) => { const x = L + i * bw + bw * .15, w = bw * .7;
+    if (d.ok) { o += `<rect x="${x}" y="${y(d.total)}" width="${w}" height="${y(0) - y(d.total)}" rx="2" fill="${cor(d.turno)}"/><text x="${x + w / 2}" y="${y(d.total) - 4}" font-size="10" text-anchor="middle" fill="#1f2a4a">${f1(d.total)}</text>`; }
+    else o += `<rect x="${x}" y="${y(100) + (y(0) - y(100)) - 3}" width="${w}" height="3" fill="#c3c8d2"/>`;
+    o += `<text x="${x + w / 2}" y="${y(0) + 14}" font-size="10" text-anchor="middle" fill="#6b7280">${d.pos}</text>`; });
+  const corte = L + tnManha * bw; o += `<line x1="${corte}" x2="${corte}" y1="${T - 6}" y2="${y(0) + 18}" stroke="#1f2a4a" stroke-dasharray="3 3"/>`;
+  [[0, "Manhã"], [1, "Tarde"]].forEach(([t, nome]) => { const g = ds.filter(d => d.turno === t && d.ok), m = tnMedia(g.map(d => d.total));
+    const x1 = t === 0 ? L : corte, x2 = t === 0 ? corte : W - R;
+    if (m !== null) o += `<line x1="${x1 + 4}" x2="${x2 - 4}" y1="${y(m)}" y2="${y(m)}" stroke="${cor(t)}" stroke-width="2.5" stroke-dasharray="7 4"/>`; });
+  o += `<text x="${(L + corte) / 2}" y="${H - 28}" font-size="13" font-weight="700" text-anchor="middle" fill="${cor(0)}">MANHÃ · 8h às 12h · média ${f1(tnMedia(ds.filter(d => d.turno === 0 && d.ok).map(d => d.total)))}</text><text x="${(corte + W - R) / 2}" y="${H - 28}" font-size="13" font-weight="700" text-anchor="middle" fill="${cor(1)}">TARDE · 12h às 17h · média ${f1(tnMedia(ds.filter(d => d.turno === 1 && d.ok).map(d => d.total)))}</text>`;
+  o += `<text x="${W / 2}" y="${H - 8}" font-size="11" text-anchor="middle" fill="#6b7280">Ordem das defesas · linha verde = 70 pontos (aprovação) · linha tracejada colorida = média do turno</text></svg>`;
+  return o;
+}
+function estudoTurnos(){
+  if (!document.getElementById("tnCards")) return;
+  const ds = tnDados(), por = [0, 1].map(t => tnResumo(ds.filter(d => d.turno === t)));
+  document.getElementById("tnCards").innerHTML = [["Manhã · 8h às 12h", "t1"], ["Tarde · 12h às 17h", "t2"]].map(([nome, k], t) => { const r = por[t];
+    return `<div class="tn-c ${k}"><h3>${nome}</h3><dl>
+      <dt>Defesas concluídas</dt><dd>${r.conc} de ${r.prev}</dd>
+      <dt>Média da nota final</dt><dd>${f1(r.media)}</dd>
+      <dt>Variação (desvio-padrão)</dt><dd>${f1(r.dp)}</dd>
+      <dt>Menor · maior nota final</dt><dd>${r.min === null ? "–" : f1(r.min) + " · " + f1(r.max)}</dd>
+      <dt>Média das notas dos examinadores</dt><dd>${f1(r.mediaEx)}</dd>
+      <dt>Notas “quebradas” (não múltiplas de 5)</dt><dd>${r.quebr === null ? "–" : r.quebr + "%"}</dd>
+      <dt>Diferença média entre os 2 examinadores</dt><dd>${f1(r.div)}</dd>
+      <dt>Aprovados · ajustes · reprovados</dt><dd>${r.ap} · ${r.aj} · ${r.rp}</dd></dl></div>`; }).join("");
+  document.getElementById("tnGraf").innerHTML = tnSvg(ds);
+  document.getElementById("tnObs").textContent = por[0].conc + por[1].conc < 6 ? "Os números se completam à medida que as defesas são concluídas; com poucas defesas, a comparação ainda não é confiável." : "Leitura: compare a média, a variação e o percentual de notas quebradas entre os turnos. Com 24 defesas, trate como indício, não como prova.";
+}
+function baixar(blob, nome){ const u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = nome; l.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
+document.addEventListener("click", e => {
+  const id = e.target && e.target.id;
+  if (id === "tnCsv") {
+    const L = [["ordem", "turno", "nº planilha", "aluno", "nota examinador 1", "nota examinador 2", "total", "situação"]];
+    tnDados().forEach(d => L.push([d.pos, d.turno ? "tarde" : "manhã", d.n, d.aluno, d.n1 ?? "", d.n2 ?? "", d.total ?? "", d.sit]));
+    baixar(new Blob(["﻿" + L.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(";")).join("\r\n")], {type: "text/csv"}), "defesas-2026-manha-tarde.csv");
+  }
+  if (id === "tnPng") {
+    const svg = tnSvg(tnDados()), img = new Image();
+    img.onload = () => { const c = document.createElement("canvas"); c.width = 1920; c.height = 760; const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, 1920, 760); x.drawImage(img, 0, 0, 1920, 760); c.toBlob(b => baixar(b, "grafico-manha-tarde-2026.png")); };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+});
+document.addEventListener("input", e => { if (e.target && e.target.id === "tnManha") { const v = parseInt(e.target.value, 10); if (v >= 1 && v <= 23) { tnManha = v; try { localStorage.setItem("tnManha", v); } catch (x) {} estudoTurnos(); } } });
 function render(){
   const lista = document.getElementById("lista");
   const vis = ALUNOS.filter(a => !filtro || sem([a.aluno, a.titulo, a.orientador, a.ex1, a.ex2].join(" ")).includes(filtro));
@@ -405,6 +498,7 @@ function render(){
 
   painel();
   chamada();
+  estudoTurnos();
   if (typeof poEl !== "undefined" && !poEl.hidden) painelOrdem();
 }
 

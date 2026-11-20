@@ -373,7 +373,7 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 
   <section class="secao" id="turnos">
     <h2>Manhã × tarde: estudo por turno</h2>
-    <p>Compara as defesas da manhã (8h às 12h) com as da tarde (12h às 17h) pela ordem oficial. Considera só as defesas concluídas. “Nota quebrada” é a nota de um examinador que não é múltiplo de 5.</p>
+    <p>Compara as defesas da manhã (8h às 12h) com as da tarde (12h às 17h) pela ordem oficial. Considera só as defesas concluídas.</p>
   </section>
   <div class="tn-ctl">
     <label>Defesas na manhã: <input type="number" id="tnManha" min="1" max="23" value="11"></label>
@@ -453,7 +453,6 @@ function estudoTurnos(){
       <dt>Variação (desvio-padrão)</dt><dd>${f1(r.dp)}</dd>
       <dt>Menor · maior nota final</dt><dd>${r.min === null ? "–" : f1(r.min) + " · " + f1(r.max)}</dd>
       <dt>Média das notas dos examinadores</dt><dd>${f1(r.mediaEx)}</dd>
-      <dt>Notas “quebradas” (não múltiplas de 5)</dt><dd>${r.quebr === null ? "–" : r.quebr + "%"}</dd>
       <dt>Diferença média entre os 2 examinadores</dt><dd>${f1(r.div)}</dd>
       <dt>Aprovados · ajustes · reprovados</dt><dd>${r.ap} · ${r.aj} · ${r.rp}</dd></dl></div>`; }).join("");
   document.getElementById("tnGraf").innerHTML = tnSvg(ds);

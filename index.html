@@ -112,6 +112,12 @@ footer{text-align:center;font-size:12px;color:var(--suave);padding:0 16px 28px}
 @media (max-width:860px){.ch-grid{grid-template-columns:1fr}}
 .agora{align-self:start;background:var(--azul);color:#fff;border-radius:10px;padding:18px 20px;border-left:6px solid var(--ouro);min-width:0}
 .agora small{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#d9c08a;font-weight:700}
+.fto{position:relative;flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--azul-2,#2c3a63);border:2px solid var(--ouro);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:15px}
+.fto::before{content:attr(data-i)} .fto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fto.gd{width:76px;height:76px;font-size:24px}
+.ag-cab{display:flex;gap:14px;align-items:center}.ag-cab>div{min-width:0}
+.t-agora .fto.gd{width:clamp(110px,12vw,170px);height:clamp(110px,12vw,170px);font-size:44px;border-width:3px}
+.t-agora .ag-cab{gap:clamp(16px,2vw,28px)}
 .ag-nome{font-size:clamp(22px,3.2vw,30px);font-weight:900;margin:6px 0 4px;line-height:1.15}
 .ag-tit{font-family:var(--f-tit);font-style:italic;font-size:16px;color:#dfe4ef;line-height:1.35}
 .ag-ex{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
@@ -422,19 +428,21 @@ const temNota = v => v !== null && v !== undefined && v !== "";
 const ORDEM = [6, 12, 10, 8, 24, 7, 22, 18, 9, 4, 13, 11, 2, 5, 3, 1, 15, 23, 21, 14, 16, 17, 19, 20];
 const ordemDe = n => String(ORDEM.indexOf(n) + 1).padStart(2, "0");
 const aluno = n => ALUNOS.find(a => a.n === n);
+const iniciais = nm => nm.split(" ").filter(w => w.length > 2).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+const foto = (a, cls) => `<span class="fto ${cls || ""}" data-i="${esc(iniciais(a.aluno))}"><img src="fotos/${a.n}.jpg" alt="${esc(a.aluno)}" loading="lazy" onerror="this.remove()"></span>`;
 const concluida = n => temNota((notas[n] || {}).total);
 function cartaoAgora(a, grande){
   if (!a) return `<div class="ag-fim"><b>Todas as defesas foram concluídas.</b><span>Obrigado, banca examinadora!</span></div>`;
   const v = notas[a.n] || {};
   const parcial = temNota(v.nota1) || temNota(v.nota2);
-  return `<small>Em defesa agora · ${ordemDe(a.n)}º de ${ORDEM.length}</small>
-    <div class="ag-nome">${esc(a.aluno)}</div>
+  return `<div class="ag-cab">${foto(a, "gd")}<div><small>Em defesa agora · ${ordemDe(a.n)}º de ${ORDEM.length}</small>
+    <div class="ag-nome">${esc(a.aluno)}</div></div></div>
     <div class="ag-tit">${esc(a.titulo)}</div>
     <div class="ag-ex"><span>Banca</span><b>${esc(a.ex1)}</b><b>${esc(a.ex2)}</b></div>
     ${parcial ? `<div class="ag-st">1 de 2 avaliações recebidas</div>` : ""}`;
 }
 function itemProx(a, i){
-  return `<li><em>${ordemDe(a.n)}º</em><div><div class="px-nome">${esc(a.aluno)}${i === 0 ? ' <span class="tag aci">a seguir</span>' : ""}</div>
+  return `<li><em>${ordemDe(a.n)}º</em>${foto(a)}<div><div class="px-nome">${esc(a.aluno)}${i === 0 ? ' <span class="tag aci">a seguir</span>' : ""}</div>
     <div class="px-tit">${esc(a.titulo)}</div>
     <div class="px-ex">${esc(a.ex1)} · ${esc(a.ex2)}</div></div></li>`;
 }
@@ -644,7 +652,7 @@ function painelOrdem(){
     if (concluida(n)) { st = "✓ Concluída"; cls = "ok"; }
     else if (n === atual) { st = "Em defesa agora"; cls = "agora"; }
     else { const k = pend.indexOf(n); st = k === 1 ? "É o próximo" : `Faltam ${k} defesas antes`; cls = "esp"; }
-    return `<li class="${cls}"><em>${ordemDe(n)}º</em><div><b>${esc(a.aluno)}</b><span>${esc(a.ex1)} · ${esc(a.ex2)}</span></div><i>${st}</i></li>`;
+    return `<li class="${cls}"><em>${ordemDe(n)}º</em>${foto(a)}<div><b>${esc(a.aluno)}</b><span>${esc(a.ex1)} · ${esc(a.ex2)}</span></div><i>${st}</i></li>`;
   }).join("") || `<li class="vz-t">Nenhum nome encontrado.</li>`;
 }
 function textoOrdem(){

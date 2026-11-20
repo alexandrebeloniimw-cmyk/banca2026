@@ -160,6 +160,10 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
 .po-cab p{margin:2px 0 0;color:var(--suave);font-size:13px}
 .po-x{background:#eef0f4;border:none;border-radius:999px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--azul);flex:none}
 .po input{width:100%;margin-bottom:8px}
+.po-zap{display:flex;gap:10px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
+.po-zap span{font-size:12px;color:var(--suave);flex:1;min-width:180px}
+.btn.zapb{background:#1fa855;color:#fff;border-color:#1fa855}
+.btn.zapb:hover{background:#18924a}
 .po-lista{list-style:none;margin:0;padding:0}
 .po-lista li{display:flex;gap:10px;align-items:center;padding:8px 6px;border-top:1px solid var(--linha)}
 .po-lista li em{font-style:normal;font-weight:900;color:var(--ouro);min-width:32px;font-variant-numeric:tabular-nums}
@@ -306,6 +310,8 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
         <button class="po-x" id="fecharOrdem" type="button" aria-label="Fechar">✕</button>
       </div>
       <input type="search" id="buscaOrdem" placeholder="Digite o nome do aluno ou do professor" aria-label="Buscar na ordem">
+      <div class="po-zap"><button class="btn zapb" id="zapOrdem" type="button">Enviar pelo WhatsApp</button>
+        <span id="zapDica">Envia só o texto da ordem, sem link da página. Digite o nome de um professor para enviar só as bancas dele.</span></div>
       <ol class="po-lista" id="poLista"></ol>
     </div>
   </div>
@@ -641,6 +647,31 @@ function painelOrdem(){
     return `<li class="${cls}"><em>${ordemDe(n)}º</em><div><b>${esc(a.aluno)}</b><span>${esc(a.ex1)} · ${esc(a.ex2)}</span></div><i>${st}</i></li>`;
   }).join("") || `<li class="vz-t">Nenhum nome encontrado.</li>`;
 }
+function textoOrdem(){
+  const pend = ORDEM.filter(n => !concluida(n));
+  const atual = pend[0];
+  const pos = n => ordemDe(n) + "º";
+  const quando = n => { if (concluida(n)) return "concluída"; if (n === atual) return "em defesa agora"; const k = pend.indexOf(n); return k === 1 ? "é a próxima" : `faltam ${k} defesas antes`; };
+  const cab = "*Ordem das defesas – 21/11/2026*\nIWE Polo Cascadura\n";
+  const agoraTxt = atual ? `\n*Em defesa agora:* ${pos(atual)} ${aluno(atual).aluno}\n${ORDEM.length - pend.length} de ${ORDEM.length} concluídas · faltam ${pend.length}\n` : "\n*Todas as defesas foram concluídas.*\n";
+  const profs = [...new Set(ALUNOS.flatMap(a => [a.ex1, a.ex2]))];
+  const achados = filtroOrdem ? profs.filter(p => sem(p).includes(filtroOrdem)) : [];
+  if (achados.length === 1) {
+    const p = achados[0];
+    const meus = ORDEM.filter(n => { const a = aluno(n); return a.ex1 === p || a.ex2 === p; });
+    const prox = meus.find(n => !concluida(n));
+    let txt = cab + `\n*${p}*\n`;
+    if (prox === undefined) txt += "Todas as suas bancas já foram concluídas. Obrigado!\n";
+    else if (prox === atual) txt += `Sua banca está acontecendo *agora*: ${pos(prox)} ${aluno(prox).aluno}.\n`;
+    else { const k = pend.indexOf(prox); txt += (k === 1 ? "*Você é o próximo!*" : `*Faltam ${k} defesas* até a sua próxima banca`) + `: ${pos(prox)} ${aluno(prox).aluno}.\n`; }
+    txt += agoraTxt + "\n*Suas bancas:*\n" + meus.map(n => `${pos(n)} ${aluno(n).aluno} – ${quando(n)}`).join("\n");
+    return txt;
+  }
+  return cab + agoraTxt + "\n" + ORDEM.map(n => { const a = aluno(n); return `${pos(n)} ${a.aluno}\n   ${a.ex1} · ${a.ex2} – ${quando(n)}`; }).join("\n");
+}
+document.addEventListener("click", e => {
+  if (e.target && e.target.id === "zapOrdem") window.open("https://wa.me/?text=" + encodeURIComponent(textoOrdem()), "_blank", "noopener");
+});
 const poEl = document.getElementById("painelOrdem");
 function abrirOrdem(e){ if (e) e.preventDefault(); poEl.hidden = false; painelOrdem(); document.getElementById("buscaOrdem").focus(); }
 function fecharOrdem(){ poEl.hidden = true; }

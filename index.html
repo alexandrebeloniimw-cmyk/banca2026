@@ -456,7 +456,7 @@ function estudoTurnos(){
       <dt>Diferença média entre os 2 examinadores</dt><dd>${f1(r.div)}</dd>
       <dt>Aprovados · ajustes · reprovados</dt><dd>${r.ap} · ${r.aj} · ${r.rp}</dd></dl></div>`; }).join("");
   document.getElementById("tnGraf").innerHTML = tnSvg(ds);
-  document.getElementById("tnObs").textContent = por[0].conc + por[1].conc < 6 ? "Os números se completam à medida que as defesas são concluídas; com poucas defesas, a comparação ainda não é confiável." : "Leitura: compare a média, a variação e o percentual de notas quebradas entre os turnos. Com 24 defesas, trate como indício, não como prova.";
+  document.getElementById("tnObs").textContent = por[0].conc + por[1].conc < 6 ? "Os números se completam à medida que as defesas são concluídas; com poucas defesas, a comparação ainda não é confiável." : "Leitura: compare a média, a variação e a diferença entre os examinadores nos dois turnos. Com 24 defesas, trate como indício, não como prova.";
 }
 function baixar(blob, nome){ const u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = nome; l.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
 document.addEventListener("click", e => {

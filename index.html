@@ -317,7 +317,8 @@ td.od{color:var(--suave);font-weight:700;font-variant-numeric:tabular-nums}
       </div>
       <input type="search" id="buscaOrdem" placeholder="Digite o nome do aluno ou do professor" aria-label="Buscar na ordem">
       <div class="po-zap"><button class="btn zapb" id="zapOrdem" type="button">Enviar pelo WhatsApp</button>
-        <span id="zapDica">Envia só o texto da ordem, sem link da página. Digite o nome de um professor para enviar só as bancas dele.</span></div>
+        <button class="btn zapb" id="zapFoto" type="button">Enviar imagem com fotos</button>
+        <span id="zapDica">Sem link da página. No celular, abre o WhatsApp com a imagem; no computador, baixa a imagem para você anexar. Digite o nome de um professor para filtrar.</span></div>
       <ol class="po-lista" id="poLista"></ol>
     </div>
   </div>
@@ -655,6 +656,49 @@ function painelOrdem(){
     return `<li class="${cls}"><em>${ordemDe(n)}º</em>${foto(a)}<div><b>${esc(a.aluno)}</b><span>${esc(a.ex1)} · ${esc(a.ex2)}</span></div><i>${st}</i></li>`;
   }).join("") || `<li class="vz-t">Nenhum nome encontrado.</li>`;
 }
+
+function carregaImg(src){ return new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; }); }
+async function imagemOrdem(){
+  const pend = ORDEM.filter(n => !concluida(n)), atual = pend[0];
+  const lista = ORDEM.filter(n => { const a = aluno(n); return !filtroOrdem || sem([a.aluno, a.ex1, a.ex2].join(" ")).includes(filtroOrdem); });
+  const imgs = await Promise.all(lista.map(n => carregaImg("fotos/" + n + ".jpg")));
+  const W = 900, RH = 92, HD = 170, dpr = 2;
+  const c = document.createElement("canvas"); c.width = W * dpr; c.height = (HD + lista.length * RH + 40) * dpr;
+  const x = c.getContext("2d"); x.scale(dpr, dpr);
+  x.fillStyle = "#f4f5f8"; x.fillRect(0, 0, W, c.height);
+  x.fillStyle = "#1f2a4a"; x.fillRect(0, 0, W, HD - 20); x.fillStyle = "#b8892a"; x.fillRect(0, HD - 24, W, 4);
+  x.fillStyle = "#d9c08a"; x.font = "700 18px Lato, Arial, sans-serif"; x.fillText("IWE · POLO CASCADURA", 36, 46);
+  x.fillStyle = "#fff"; x.font = "600 38px Georgia, serif"; x.fillText("Ordem das defesas", 36, 92);
+  x.fillStyle = "#c9cfdd"; x.font = "20px Lato, Arial, sans-serif";
+  x.fillText("21 de novembro de 2026 · " + (ORDEM.length - pend.length) + " de " + ORDEM.length + " concluídas · faltam " + pend.length, 36, 126);
+  const corta = (t, m) => { while (x.measureText(t).width > m && t.length > 3) t = t.slice(0, -2); return t; };
+  lista.forEach((n, i) => {
+    const a = aluno(n), y = HD + i * RH, ok = concluida(n), ag = n === atual;
+    x.fillStyle = ag ? "#fdf6e3" : "#fff"; x.fillRect(20, y, W - 40, RH - 8);
+    x.strokeStyle = ag ? "#b8892a" : "#e3e6ec"; x.lineWidth = ag ? 3 : 1; x.strokeRect(20, y, W - 40, RH - 8);
+    x.globalAlpha = ok ? .55 : 1;
+    x.fillStyle = "#b8892a"; x.font = "900 26px Lato, Arial, sans-serif"; x.fillText(ordemDe(n) + "º", 36, y + 52);
+    const cx = 130, cy = y + (RH - 8) / 2, r = 31;
+    x.save(); x.beginPath(); x.arc(cx, cy, r, 0, 7); x.clip();
+    if (imgs[i]) x.drawImage(imgs[i], cx - r, cy - r, r * 2, r * 2); else { x.fillStyle = "#2c3a63"; x.fillRect(cx - r, cy - r, r * 2, r * 2); }
+    x.restore(); x.beginPath(); x.arc(cx, cy, r, 0, 7); x.strokeStyle = "#b8892a"; x.lineWidth = 2; x.stroke();
+    x.fillStyle = "#1f2a4a"; x.font = "700 22px Lato, Arial, sans-serif"; x.fillText(corta(a.aluno, 470), 180, y + 38);
+    x.fillStyle = "#6b7280"; x.font = "16px Lato, Arial, sans-serif"; x.fillText(corta(a.ex1 + " · " + a.ex2, 470), 180, y + 64);
+    const k = pend.indexOf(n), st = ok ? "✓ Concluída" : ag ? "Em defesa agora" : k === 1 ? "É a próxima" : "Faltam " + k + " antes";
+    x.textAlign = "right"; x.fillStyle = ok ? "#1d7349" : ag ? "#9a5d07" : "#6b7280"; x.font = "700 17px Lato, Arial, sans-serif";
+    x.fillText(st, W - 36, y + 52); x.textAlign = "left"; x.globalAlpha = 1;
+  });
+  x.fillStyle = "#6b7280"; x.font = "14px Lato, Arial, sans-serif"; x.fillText("Atualizado às " + new Date().toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}), 36, c.height / dpr - 14);
+  return new Promise(r => c.toBlob(r, "image/png"));
+}
+async function enviarImagem(btn){
+  const t = btn.textContent; btn.textContent = "Gerando imagem…"; btn.disabled = true;
+  try {
+    const blob = await imagemOrdem(); const f = new File([blob], "ordem-das-defesas.png", {type: "image/png"});
+    if (navigator.canShare && navigator.canShare({files: [f]})) { try { await navigator.share({files: [f], title: "Ordem das defesas"}); } catch(e) {} }
+    else { const u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = "ordem-das-defesas.png"; l.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
+  } finally { btn.textContent = t; btn.disabled = false; }
+}
 function textoOrdem(){
   const pend = ORDEM.filter(n => !concluida(n));
   const atual = pend[0];
@@ -678,6 +722,7 @@ function textoOrdem(){
   return cab + agoraTxt + "\n" + ORDEM.map(n => { const a = aluno(n); return `${pos(n)} ${a.aluno}\n   ${a.ex1} · ${a.ex2} – ${quando(n)}`; }).join("\n");
 }
 document.addEventListener("click", e => {
+  if (e.target && e.target.id === "zapFoto") enviarImagem(e.target);
   if (e.target && e.target.id === "zapOrdem") window.open("https://wa.me/?text=" + encodeURIComponent(textoOrdem()), "_blank", "noopener");
 });
 const poEl = document.getElementById("painelOrdem");
